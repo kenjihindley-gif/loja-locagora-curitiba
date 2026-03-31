@@ -1,19 +1,22 @@
 {
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "locagora-loja",
-          "region": "us-west1"
+  "hosting": [
+    {
+      "site": "lojalocagoracuritiba",
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "run": {
+            "serviceId": "locagora-loja",
+            "region": "us-west1"
+          }
         }
-      }
-    ]
-  }
+      ]
+    }
+  ]
 }
