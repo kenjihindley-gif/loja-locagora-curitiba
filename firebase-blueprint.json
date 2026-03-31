@@ -1,0 +1,223 @@
+{
+  "entities": {
+    "Motorcycle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Motorcycle",
+      "type": "object",
+      "description": "Represents a motorcycle available in the Kinetic Velocity catalog, including its details, pricing, and associated images.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Motorcycle entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The model name of the motorcycle, e.g., 'Apex Predator 1200' or 'Stealth R-750 Edition'."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the motorcycle's features, capabilities, and highlights."
+        },
+        "modelYear": {
+          "type": "number",
+          "description": "The manufacturing or model year of the motorcycle."
+        },
+        "condition": {
+          "type": "string",
+          "description": "The condition of the motorcycle, such as '0 KM' (new) or 'Seminovas' (used)."
+        },
+        "startingPriceAmount": {
+          "type": "number",
+          "description": "The numerical value of the starting price for the motorcycle."
+        },
+        "startingPriceCurrency": {
+          "type": "string",
+          "description": "The three-letter currency code for the starting price (e.g., 'BRL' for Brazilian Real, 'USD' for US Dollar)."
+        },
+        "fixedDepositAmount": {
+          "type": "number",
+          "description": "The numerical value of the fixed deposit amount required for reservation or financing."
+        },
+        "fixedDepositCurrency": {
+          "type": "string",
+          "description": "The three-letter currency code for the fixed deposit (e.g., 'BRL', 'USD')."
+        },
+        "weeklyPaymentAmount": {
+          "type": "number",
+          "description": "The numerical value of the weekly payment amount for financing plans."
+        },
+        "weeklyPaymentCurrency": {
+          "type": "string",
+          "description": "The three-letter currency code for the weekly payment (e.g., 'BRL', 'USD')."
+        },
+        "promotionTag": {
+          "type": "string",
+          "description": "An optional tag indicating a special promotion or status (e.g., 'Exclusive Offer', 'New Arrival') for display in carousels."
+        },
+        "mainImageUrl": {
+          "type": "string",
+          "description": "URL to the primary promotional image of the motorcycle, used in listings and carousels.",
+          "format": "uri"
+        },
+        "galleryImageUrls": {
+          "type": "array",
+          "description": "An array of URLs to additional images for the motorcycle's detailed view gallery.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "modelYear",
+        "condition",
+        "startingPriceAmount",
+        "startingPriceCurrency",
+        "fixedDepositAmount",
+        "fixedDepositCurrency",
+        "weeklyPaymentAmount",
+        "weeklyPaymentCurrency",
+        "mainImageUrl",
+        "galleryImageUrls"
+      ]
+    },
+    "TechnicalSpecification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TechnicalSpecification",
+      "type": "object",
+      "description": "Represents a single technical detail or specification for a motorcycle, such as engine type or transmission.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the TechnicalSpecification entity."
+        },
+        "motorcycleId": {
+          "type": "string",
+          "description": "Reference to the Motorcycle this technical specification belongs to. (Relationship: Motorcycle 1:N TechnicalSpecification)"
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the technical specification (e.g., 'Engine', 'Transmission', 'Dimensions', 'Brakes')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the specific technical feature (e.g., 'Engine Displacement', 'Transmission Type', 'Fuel Capacity')."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value or description of the technical feature (e.g., '1200cc', '6 Gears', '15 Liters')."
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of measurement for the value, if applicable (e.g., 'cc', 'Gears', 'Litros')."
+        }
+      },
+      "required": [
+        "id",
+        "motorcycleId",
+        "category",
+        "name",
+        "value"
+      ]
+    },
+    "Seller": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Seller",
+      "type": "object",
+      "description": "Represents a seller or sales agent who might be associated with a motorcycle reservation or inquiry.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Seller entity."
+        },
+        "sellerCode": {
+          "type": "string",
+          "description": "A unique code assigned to the seller for tracking referrals or associations, which can be entered by the user."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the seller or sales agent."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the seller.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number of the seller, typically used for WhatsApp contact."
+        }
+      },
+      "required": [
+        "id",
+        "sellerCode",
+        "name"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/motorcycles/{motorcycleId}",
+        "definition": {
+          "entityName": "motorcycle",
+          "schema": {
+            "$ref": "#/backend/entities/Motorcycle"
+          },
+          "description": "Stores details for each motorcycle in the catalog. All documents in this collection are publicly readable. Includes image URLs that reference Firebase Storage.",
+          "params": [
+            {
+              "name": "motorcycleId",
+              "description": "The unique identifier for a specific motorcycle."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/motorcycles/{motorcycleId}/technicalSpecifications/{technicalSpecificationId}",
+        "definition": {
+          "entityName": "technicalSpecification",
+          "schema": {
+            "$ref": "#/backend/entities/TechnicalSpecification"
+          },
+          "description": "Stores technical specifications for a specific motorcycle. This is a subcollection, with all documents publicly readable. The 'motorcycleId' field inside the document explicitly links it to its parent, aiding queryability and authorization independence.",
+          "params": [
+            {
+              "name": "motorcycleId",
+              "description": "The unique identifier of the parent motorcycle."
+            },
+            {
+              "name": "technicalSpecificationId",
+              "description": "The unique identifier for a specific technical specification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sellers/{sellerId}",
+        "definition": {
+          "entityName": "seller",
+          "schema": {
+            "$ref": "#/backend/entities/Seller"
+          },
+          "description": "Stores details for sales agents or sellers. All documents in this collection are publicly readable, allowing users to associate their reservation with a seller code.",
+          "params": [
+            {
+              "name": "sellerId",
+              "description": "The unique identifier for a specific seller."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for Kinetic Velocity prioritizes public data access for the product catalog, adhering to strong security principles by avoiding complex authorization dependencies. \n\n**Authorization Independence:** All primary collections (`/motorcycles`, `/sellers`) and subcollections (`/motorcycles/{motorcycleId}/technicalSpecifications`) are designed for public read access. This design inherently achieves Authorization Independence, as no document's access relies on `get()` calls to other documents within security rules. Each document's permission can be determined by its own data and path, simplifying rule logic significantly. This also supports atomic creation and updates across parent/child documents, if write rules were to be introduced for administrative purposes.\n\n**QAPs (Rules are not Filters):** Since the application's core feature is a motorcycle catalog, all `Motorcycle`, `TechnicalSpecification`, and `Seller` documents are intended to be publicly readable. This ensures that `list` operations are inherently secure and efficient; users can query and retrieve entire collections or subcollections (e.g., all motorcycles, or all technical specifications for a specific motorcycle) without needing additional filtering within the security rules. The `motorcycleId` field within the `TechnicalSpecification` entity (and implicitly via its subcollection path) is crucial for efficient querying of related specifications.\n\n**Structural Segregation:** Each collection maintains a homogeneous security posture. `/motorcycles` contains only `Motorcycle` entities, `/sellers` contains only `Seller` entities, and `/motorcycles/{motorcycleId}/technicalSpecifications` contains only `TechnicalSpecification` entities. All are publicly readable, preventing mixed access requirements within the same collection.\n\n**Access Modeling:**\n*   `Motorcycle` and `Seller` entities are placed in top-level, plural collections, representing globally accessible entities. This aligns with the public catalog nature.\n*   `TechnicalSpecification` is structured as a subcollection under `/motorcycles/{motorcycleId}`. This hierarchical path correctly models the 1:N relationship (one motorcycle has many technical specifications) and groups related data logically, making queries for a specific motorcycle's specifications intuitive and performant.\n\n**Image Storage:** Addressing the user's specific request for image storage without size limitations, Firebase Storage is the recommended solution. The `mainImageUrl` and `galleryImageUrls` fields in the `Motorcycle` entity will store public download URLs from Firebase Storage. This decouples large binary data from Firestore documents, providing scalable and cost-effective media storage while keeping document sizes small and queries fast."
+  }
+}

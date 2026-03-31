@@ -1,0 +1,10 @@
+{
+  "projectId": "loja-locagora",
+  "appId": "1:927761950403:web:77c4032a2f236f77a1e476",
+  "apiKey": "AIzaSyDOGiuqKRt0VDKbLriVxJE9wng2_mo_B0c",
+  "authDomain": "loja-locagora.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "loja-locagora.firebasestorage.app",
+  "messagingSenderId": "927761950403",
+  "measurementId": "G-8B84LM6CYL"
+}
