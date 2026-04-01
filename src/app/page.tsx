@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -67,7 +68,7 @@ const MarqueeSection = () => {
 
   return (
     <div className="w-full bg-[#E5E5E5] py-2 overflow-hidden flex relative border-y border-border">
-      <div className="flex animate-marquee w-max">
+      <div className="flex animate-marquee w-max gap-8">
         {content}
         {content}
         {content}
@@ -158,8 +159,12 @@ const HeroSection = () => {
 }
 
 
-export default function Home() {
-  const [filter, setFilter] = useState('Todos');
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  const filter = searchParams.get('categoria') || 'Todos';
   const [scrolled, setScrolled] = useState(false);
 
   const firestore = useFirestore();
@@ -180,6 +185,16 @@ export default function Home() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const handleFilterChange = (newFilter: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (newFilter === 'Todos') {
+      params.delete('categoria');
+    } else {
+      params.set('categoria', newFilter);
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const filteredModels = React.useMemo(() => {
     if (!availableModels) return [];
@@ -308,9 +323,9 @@ export default function Home() {
 
         <section className="px-6 py-6 md:hidden">
           <div className="grid grid-cols-3 gap-2 p-1 bg-muted rounded-full">
-              <Button size="sm" variant={filter === 'Todos' ? 'secondary' : 'ghost'} onClick={() => setFilter('Todos')} className="rounded-full">Todos</Button>
-              <Button size="sm" variant={filter === '0 KM' ? 'secondary' : 'ghost'} onClick={() => setFilter('0 KM')} className="rounded-full">Zero km</Button>
-              <Button size="sm" variant={filter === 'Seminova' ? 'secondary' : 'ghost'} onClick={() => setFilter('Seminova')} className="rounded-full">Seminova</Button>
+              <Button size="sm" variant={filter === 'Todos' ? 'secondary' : 'ghost'} onClick={() => handleFilterChange('Todos')} className="rounded-full">Todos</Button>
+              <Button size="sm" variant={filter === '0 KM' ? 'secondary' : 'ghost'} onClick={() => handleFilterChange('0 KM')} className="rounded-full">Zero km</Button>
+              <Button size="sm" variant={filter === 'Seminova' ? 'secondary' : 'ghost'} onClick={() => handleFilterChange('Seminova')} className="rounded-full">Seminova</Button>
           </div>
         </section>
 
@@ -318,9 +333,9 @@ export default function Home() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <h3 className="font-headline text-xl md:text-3xl font-bold tracking-tight text-foreground">Modelos Disponíveis</h3>
             <div className="hidden md:flex gap-2 p-1 bg-muted rounded-full">
-                <Button size="sm" variant={filter === 'Todos' ? 'secondary' : 'ghost'} onClick={() => setFilter('Todos')} className="rounded-full px-6">Todos</Button>
-                <Button size="sm" variant={filter === '0 KM' ? 'secondary' : 'ghost'} onClick={() => setFilter('0 KM')} className="rounded-full px-6">Zero km</Button>
-                <Button size="sm" variant={filter === 'Seminova' ? 'secondary' : 'ghost'} onClick={() => setFilter('Seminova')} className="rounded-full px-6">Seminova</Button>
+                <Button size="sm" variant={filter === 'Todos' ? 'secondary' : 'ghost'} onClick={() => handleFilterChange('Todos')} className="rounded-full px-6">Todos</Button>
+                <Button size="sm" variant={filter === '0 KM' ? 'secondary' : 'ghost'} onClick={() => handleFilterChange('0 KM')} className="rounded-full px-6">Zero km</Button>
+                <Button size="sm" variant={filter === 'Seminova' ? 'secondary' : 'ghost'} onClick={() => handleFilterChange('Seminova')} className="rounded-full px-6">Seminova</Button>
             </div>
           </div>
           
@@ -339,5 +354,20 @@ export default function Home() {
         <LocationSection />
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground font-headline animate-pulse">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

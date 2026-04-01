@@ -2,13 +2,45 @@ import { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, setDoc 
 import { getFirestore } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeFirebase } from '@/firebase';
+import { z } from 'zod';
 
-export type MotorcycleSpec = {
-  motor: string;
-  transmission: string;
-  year: string;
-  km?: string;
-};
+export const MotorcycleSpecSchema = z.object({
+  motor: z.string(),
+  transmission: z.string(),
+  year: z.string(),
+  km: z.string().optional(),
+});
+
+export const ColorOptionSchema = z.object({
+  name: z.string(),
+  hex: z.string(),
+  imageUrls: z.array(z.string()),
+  mainImageIndex: z.number(),
+});
+
+export const MotorcycleSchema = z.object({
+  name: z.string().min(1, "O nome é obrigatório"),
+  category: z.enum(['0 KM', 'Seminova']),
+  priceAnual: z.string().optional(),
+  priceFidelidade: z.string().optional(),
+  description: z.string().optional(),
+  specs: MotorcycleSpecSchema,
+  isNew: z.boolean(),
+  km: z.string().optional(),
+  isPromotion: z.boolean(),
+  promotionConditions: z.string().optional(),
+  imageHint: z.string(),
+  imageUrls: z.array(z.string()),
+  mainImageIndex: z.number(),
+  hasMultipleColors: z.boolean().optional(),
+  colors: z.array(ColorOptionSchema).optional(),
+  views: z.number().optional(),
+  clicks: z.number().optional(),
+});
+
+export type MotorcycleSpec = z.infer<typeof MotorcycleSpecSchema>;
+export type ColorOption = z.infer<typeof ColorOptionSchema>;
+export type MotorcycleData = z.infer<typeof MotorcycleSchema>;
 
 export const AVAILABLE_COLORS = [
     { name: "Preto", hex: "#000000" },
@@ -30,26 +62,6 @@ export type ColorOption = {
     hex: string;
     imageUrls: string[];
     mainImageIndex: number;
-};
-
-// This is the data structure for creating/updating motorcycles.
-// It doesn't include the `id` field, as that's managed by Firestore.
-export type MotorcycleData = {
-  name: string;
-  category: '0 KM' | 'Seminova';
-  priceAnual?: string;
-  priceFidelidade?: string;
-  description?: string;
-  specs: MotorcycleSpec;
-  isNew: boolean;
-  km?: string;
-  isPromotion: boolean;
-  promotionConditions?: string;
-  imageHint: string;
-  imageUrls: string[]; 
-  mainImageIndex: number;
-  hasMultipleColors?: boolean;
-  colors?: ColorOption[];
 };
 
 // This is the data structure for motorcycles retrieved from Firestore.
@@ -180,8 +192,12 @@ export async function getMotorcycleById(id: string): Promise<Motorcycle | undefi
 export async function addMotorcycle(motoData: MotorcycleData): Promise<string> {
     const db = getDb();
     const motorcyclesCol = collection(db, 'motorcycles');
+    
+    // Validate data using Zod
+    const validatedData = MotorcycleSchema.parse(motoData);
+    
     // Remove undefined fields recursively before sending to Firestore
-    const cleanData = JSON.parse(JSON.stringify(motoData));
+    const cleanData = JSON.parse(JSON.stringify(validatedData));
     const docRef = await addDoc(motorcyclesCol, cleanData);
     return docRef.id;
 }
@@ -189,8 +205,12 @@ export async function addMotorcycle(motoData: MotorcycleData): Promise<string> {
 export async function updateMotorcycle(id: string, updatedMotoData: Partial<MotorcycleData>): Promise<void> {
     const db = getDb();
     const motorcycleDoc = doc(db, 'motorcycles', id);
+    
+    // Validate partial data using Zod
+    const validatedData = MotorcycleSchema.partial().parse(updatedMotoData);
+    
     // Remove undefined fields recursively before sending to Firestore
-    const cleanData = JSON.parse(JSON.stringify(updatedMotoData));
+    const cleanData = JSON.parse(JSON.stringify(validatedData));
     await updateDoc(motorcycleDoc, cleanData);
 }
 

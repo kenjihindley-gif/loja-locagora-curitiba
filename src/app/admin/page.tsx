@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from '@/components/ui/label';
 import { MotorcycleForm } from '@/components/admin/motorcycle-form';
 import { MotorcycleManagement } from '@/components/admin/motorcycle-management';
-import { ArrowLeft, PlusCircle, Wrench } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Wrench, BarChart3, Eye, MousePointerClick } from 'lucide-react';
 import type { Motorcycle } from '@/lib/motorcycles';
 import { useCollection } from '@/firebase';
 import { collection } from 'firebase/firestore';
@@ -71,7 +71,7 @@ export default function AdminPage() {
 
   if (isAuthenticated) {
     return (
-      <div className="container mx-auto py-10 px-4 min-h-screen">
+      <div className="container mx-auto py-10 px-4">
         {view !== 'dashboard' && (
            <div className="mb-8">
              <Button variant="ghost" onClick={() => setView('dashboard')}>
@@ -86,7 +86,8 @@ export default function AdminPage() {
                 <h1 className="text-3xl font-bold font-headline">Painel Administrativo</h1>
                 <Button onClick={handleLogout} variant="outline">Sair</Button>
             </div>
-            <div className="grid md:grid-cols-2 gap-8">
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setView('add')}>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><PlusCircle />Criar Anúncio</CardTitle>
@@ -104,6 +105,42 @@ export default function AdminPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><BarChart3 className="h-5 w-5" /> Analytics de Motos</CardTitle>
+                <CardDescription>Acompanhe visualizações e cliques em cada modelo.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
+                      <tr>
+                        <th className="px-6 py-3 rounded-tl-lg">Modelo</th>
+                        <th className="px-6 py-3">Categoria</th>
+                        <th className="px-6 py-3"><div className="flex items-center gap-1"><Eye className="h-4 w-4"/> Visualizações</div></th>
+                        <th className="px-6 py-3 rounded-tr-lg"><div className="flex items-center gap-1"><MousePointerClick className="h-4 w-4"/> Cliques (Reserva)</div></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {motorcycles.map((moto) => (
+                        <tr key={moto.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                          <td className="px-6 py-4 font-medium">{moto.name}</td>
+                          <td className="px-6 py-4">{moto.category}</td>
+                          <td className="px-6 py-4">{moto.views || 0}</td>
+                          <td className="px-6 py-4">{moto.clicks || 0}</td>
+                        </tr>
+                      ))}
+                      {motorcycles.length === 0 && !isLoading && (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">Nenhuma moto cadastrada.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </>
         )}
         
@@ -115,7 +152,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted/40">
+    <div className="flex items-center justify-center h-full min-h-[60vh] bg-muted/40">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl font-headline">Acesso Restrito</CardTitle>

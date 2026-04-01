@@ -23,9 +23,9 @@ export function DesktopHeader() {
       scrolled ? "bg-black/80 backdrop-blur-lg border-b border-gray-700" : "bg-black border-b border-transparent"
     )}>
       <div className="flex items-center gap-10">
-        <Link href="/">
+        <a href="https://www.instagram.com/locagoracuritibaoficial/" target="_blank" rel="noopener noreferrer">
           <Image src="https://i.imgur.com/X4STrg9.png" alt="Logo" width={120} height={40} />
-        </Link>
+        </a>
         <nav className="flex items-center gap-6 text-sm font-medium">
           <Link href="/" className="text-white/80 hover:text-white transition-colors">
             Início

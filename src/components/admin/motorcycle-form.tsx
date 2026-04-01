@@ -37,6 +37,7 @@ const ColorImageUploader = ({
     const { toast } = useToast();
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
 
     const handleFiles = (files: FileList | null) => {
         if (!files) return;
@@ -81,6 +82,7 @@ const ColorImageUploader = ({
     };
 
     const openFileDialog = () => fileInputRef.current?.click();
+    const openCameraDialog = () => cameraInputRef.current?.click();
 
     const removeImage = (indexToRemove: number) => {
         const newPreviews = imagePreviews.filter((_, i) => i !== indexToRemove);
@@ -101,7 +103,7 @@ const ColorImageUploader = ({
             className={cn(
                 "w-full p-4 transition-colors border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-center",
                 isDragging ? "border-primary bg-primary/10" : "border-muted-foreground/30 bg-muted/20 hover:border-primary/50 hover:bg-primary/5",
-                imagePreviews.length === 0 && "aspect-video cursor-pointer",
+                imagePreviews.length === 0 && "aspect-video"
             )}>
             <input
                 ref={fileInputRef}
@@ -111,10 +113,26 @@ const ColorImageUploader = ({
                 onChange={handleFileSelect}
                 multiple
             />
+            <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleFileSelect}
+            />
             {imagePreviews.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 text-muted-foreground" onClick={openFileDialog}>
+                <div className="flex flex-col items-center gap-4 text-muted-foreground w-full">
                     <UploadCloud className="w-10 h-10" />
-                    <p className="font-semibold">Arraste e solte ou clique para enviar</p>
+                    <p className="font-semibold">Arraste e solte ou escolha uma opção</p>
+                    <div className="flex gap-4">
+                        <Button type="button" variant="outline" onClick={openFileDialog}>
+                            Subir Arquivos
+                        </Button>
+                        <Button type="button" variant="outline" onClick={openCameraDialog}>
+                            Abrir Câmera
+                        </Button>
+                    </div>
                     <p className="text-xs">PNG, JPG, WEBP (até {MAX_IMAGES} imagens)</p>
                 </div>
             ) : (
@@ -155,8 +173,9 @@ const ColorImageUploader = ({
                         </div>
                     ))}
                     {imagePreviews.length < MAX_IMAGES && (
-                        <div onClick={(e) => {e.stopPropagation(); openFileDialog()}} className="flex items-center justify-center aspect-square border-2 border-dashed rounded-md text-muted-foreground hover:border-primary hover:text-primary transition-colors cursor-pointer">
-                            <UploadCloud className="w-8 h-8" />
+                        <div className="flex flex-col gap-2 items-center justify-center aspect-square border-2 border-dashed rounded-md text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                            <UploadCloud className="w-6 h-6 cursor-pointer" onClick={(e) => {e.stopPropagation(); openFileDialog()}} />
+                            <div className="text-xs cursor-pointer" onClick={(e) => {e.stopPropagation(); openCameraDialog()}}>Câmera</div>
                         </div>
                     )}
                </div>

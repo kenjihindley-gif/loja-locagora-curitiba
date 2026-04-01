@@ -1,95 +1,13 @@
-/**
- * Core Philosophy: This ruleset enforces a secure, read-only public catalog model.
- * The primary goal is to allow any user, authenticated or not, to browse the full
- * motorcycle catalog, its technical specifications, and seller information. All
- * client-side write operations (create, update, delete) are explicitly forbidden
- * to protect the integrity of the catalog data. Data is expected to be managed
- * by administrators through a separate, trusted environment (e.g., Firebase Console, Admin SDK).
- *
- * Key Security Decisions:
- * - Public Read Access: All collections are publicly readable to support the app's
- *   function as a catalog. `get` and `list` are universally permitted.
- * - Write Prohibition: To maintain data integrity and prevent unauthorized
- *   modifications, all write operations from the client are disabled (`if false;`).
- * - Authorization Independence: The read-only model is inherently performant and
- *   simple, as no rules require cross-document `get()` calls to resolve permissions.
- *
- * Denormalization for Authorization: Not applicable in this read-only model, as no
- * authorization decisions are needed. The data model is already structured for
- * efficient querying.
- *
- * Structural Segregation: Each collection has a uniform security posture (public read),
- * with `/motorcycles` and `/sellers` at the top level and technical data nested
- * logically in a `/technicalSpecifications` subcollection.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // The 'isSignedIn' function and its usage of 'request' were removed as
-    // they were unused and irrelevant to the specified public read-only model.
-    // All existing rules correctly implement public read and denied write access
-    // without needing authentication checks.
-
-    // -------------------------------------------------------------------------
-    // Collection Rules: /motorcycles
-    // -------------------------------------------------------------------------
-
-    /**
-     * @description Controls access to the public motorcycle catalog. Anyone can read
-     *              motorcycle data, but no one can modify it from the client.
-     * @path /motorcycles/{motorcycleId}
-     * @allow (get) Any user, signed in or not, can fetch a specific motorcycle document.
-     * @deny (create) An anonymous or signed-in user cannot create a new motorcycle document.
-     * @principle Establishes a public, read-only collection for catalog data.
-     */
     match /motorcycles/{motorcycleId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
-
-      // -----------------------------------------------------------------------
-      // Subcollection Rules: /technicalSpecifications
-      // -----------------------------------------------------------------------
-
-      /**
-       * @description Controls access to a motorcycle's technical specifications. Anyone can
-       *              read the specs, but no one can modify them from the client.
-       * @path /motorcycles/{motorcycleId}/technicalSpecifications/{technicalSpecificationId}
-       * @allow (list) Any user can list all technical specs for a given motorcycle.
-       * @deny (update) A user cannot update an existing technical specification document.
-       * @principle Ensures nested catalog data remains public and immutable.
-       */
-      match /technicalSpecifications/{technicalSpecificationId} {
-        allow get: if true;
-        allow list: if true;
-        allow create: if true;
-        allow update: if true;
-        allow delete: if true;
-      }
+      allow read: if true;
+      allow write: if request.auth != null;
     }
-
-
-    // -------------------------------------------------------------------------
-    // Collection Rules: /sellers
-    // -------------------------------------------------------------------------
-
-    /**
-     * @description Controls access to public seller information. Anyone can read
-     *              seller details, but no one can modify them from the client.
-     * @path /sellers/{sellerId}
-     * @allow (get) Any user, signed in or not, can fetch a specific seller's document.
-     * @deny (delete) A user cannot delete a seller's document.
-     * @principle Establishes a public, read-only collection for associated seller data.
-     */
     match /sellers/{sellerId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }

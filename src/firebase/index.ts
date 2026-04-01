@@ -5,6 +5,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
+import { getAnalytics, isSupported } from 'firebase/analytics'
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
@@ -34,11 +35,17 @@ export function initializeFirebase() {
 }
 
 export function getSdks(firebaseApp: FirebaseApp) {
+  let analytics = null;
+  if (typeof window !== 'undefined') {
+    isSupported().then(yes => yes ? analytics = getAnalytics(firebaseApp) : null);
+  }
+
   return {
     firebaseApp,
     auth: getAuth(firebaseApp),
     firestore: getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId),
-    storage: getStorage(firebaseApp)
+    storage: getStorage(firebaseApp),
+    analytics
   };
 }
 
