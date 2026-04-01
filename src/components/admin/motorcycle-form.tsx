@@ -284,7 +284,7 @@ export function MotorcycleForm({ initialData, onSave }: { initialData?: Motorcyc
             const motorcycleData: Partial<MotorcycleData> = {
                 name,
                 priceFidelidade,
-                priceAnual: category !== 'Seminova' ? priceAnual : undefined,
+                priceAnual: isPromotion ? undefined : priceAnual,
                 description,
                 specs: { motor, transmission, year },
                 isNew: category === '0 KM',
@@ -381,8 +381,8 @@ export function MotorcycleForm({ initialData, onSave }: { initialData?: Motorcyc
                                 <Input id="price-fidelidade" type="number" step="0.01" placeholder="Ex: 249.90" value={priceFidelidade} onChange={e => setPriceFidelidade(e.target.value)} required/>
                             </div>
                              <div className="space-y-2">
-                                <Label htmlFor="price-anual" className={isPromotion || category === 'Seminova' ? 'text-muted-foreground/50' : ''}>Preço Semanal (Anual)</Label>
-                                <Input id="price-anual" type="number" step="0.01" placeholder="Ex: 299.90" value={priceAnual} onChange={e => setPriceAnual(e.target.value)} disabled={isPromotion || category === 'Seminova'} />
+                                <Label htmlFor="price-anual" className={isPromotion ? 'text-muted-foreground/50' : ''}>Preço Semanal (Anual)</Label>
+                                <Input id="price-anual" type="number" step="0.01" placeholder="Ex: 299.90" value={priceAnual} onChange={e => setPriceAnual(e.target.value)} disabled={isPromotion} />
                             </div>
                         </div>
 
