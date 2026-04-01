@@ -1,0 +1,42 @@
+Vamos resolver isso agora mesmo. Siga estes 3 passos finais e sua loja vai estar no ar em menos de 2 minutos:
+
+1. Criar o arquivo corrigido
+Copie e cole todo esse bloco de uma vez no terminal do Cloud Shell:
+
+Bash
+cat <<EOF > firebase.json
+{
+  "hosting": {
+    "site": "loja-locagora",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "locagora-loja",
+          "region": "us-west1"
+        }
+      }
+    ]
+  }
+}
+EOF
+2. O Comando de Ouro (O Deploy)
+Agora, rode o comando para publicar:
+
+Bash
+firebase deploy --only hosting --project loja-locagora
+3. Testar o Link
+Assim que aparecer a mensagem verde ✔ Deploy complete!, sua loja estará viva no link limpo:
+
+👉 https://loja-locagora.web.app
+
+E o link lojalocagoracuritiba?
+Como ele não apareceu na sua lista do Firebase (hosting:sites:list), significa que ele ainda não foi "criado" como um site dentro desse projeto específico.
+
+Quer que eu te ensine a criar o link lojalocagoracuritiba.web.app agora mesmo para ele também funcionar? É só um comando a mais!
